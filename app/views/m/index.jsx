@@ -3,6 +3,7 @@ var React     = require("react");
 var Router    = require("react-router");
 
 var components = require("components");
+var ceres      = require("lib/ceres");
 var colors     = require("lib/colors");
 
 var styles = {
@@ -17,7 +18,7 @@ var styles = {
     emptyChannelText: {
         textAlign: "center"
     },
-    createFlame: {
+    createSpark: {
         textDecoration: "none",
         fontSize: 20,
         color: colors.grey500
@@ -27,19 +28,25 @@ var styles = {
 var M = React.createClass({
     mixins: [Router.State],
     propTypes: {
-        flames: React.PropTypes.instanceOf(Immutable.Map)
+        sparks: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+        users: React.PropTypes.instanceOf(Immutable.Map).isRequired
+    },
+    statics: {
+        willTransitionTo: function (transition, params) {
+            ceres.subscribe("sparks:byChannel", params.name);
+        }
     },
     renderEmptyChannel: function () {
-        return this.props.flames.size === 0 ? (
+        return this.props.sparks.size === 0 ? (
             <div style={styles.emptyChannel}>
                 <div style={styles.emptyChannelText}>
-                    {"no flames to show for this channel"}
+                    {"no sparks to show for this channel"}
                     <br />
                     <br />
                     <Router.Link
                         to="kindle"
                         params={this.getParams()}
-                        style={styles.createFlame}
+                        style={styles.createSpark}
                     >
                         {"create one now"}
                     </Router.Link>
@@ -47,16 +54,25 @@ var M = React.createClass({
             </div>
         ) : null;
     },
-    renderFlameCards: function () {
-        return this.props.flames.map(function (flame) {
-            return <components.FlameCard flame={flame} />;
+    renderSparkCards: function () {
+        var self = this;
+        var index = 1;
+        return self.props.sparks.map(function (spark, _id) {
+            return (
+                <components.SparkCard
+                    key={_id}
+                    users={self.props.users}
+                    spark={spark}
+                    position={index++}
+                />
+            );
         }).toJS();
     },
     render: function () {
         return (
-            <div style={styles.emptyChannel}>
+            <div>
                 {this.renderEmptyChannel()}
-                {this.renderFlameCards()}
+                {this.renderSparkCards()}
             </div>
         );
     }

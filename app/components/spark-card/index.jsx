@@ -5,7 +5,9 @@ var Router    = require("react-router");
 var url       = require("url");
 var vagueTime = require("vague-time");
 
-var colors = require("lib/colors");
+var components = require("components");
+var ceres      = require("lib/ceres");
+var colors     = require("lib/colors");
 
 var styles = {
     card: {
@@ -18,18 +20,6 @@ var styles = {
         alignItems: "center",
         color: colors.grey500,
         width: 25
-    },
-    voteButtons: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: 16,
-        color: colors.grey500,
-        width: 15
-    },
-    clickable: {
-        cursor: "pointer"
     },
     info: {
         display: "flex",
@@ -52,39 +42,45 @@ var styles = {
     }
 };
 
-var FlameCard = React.createClass({
+var SparkCard = React.createClass({
     propTypes: {
-        flame: React.PropTypes.instanceOf(Immutable.Map)
+        users: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+        spark: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+        position: React.PropTypes.number.isRequired
+    },
+    componentWillMount: function () {
+        this.subscription = ceres.subscribe(
+            "sparks:flamesCount",
+            this.props.spark.get("_id")
+        );
+    },
+    componentWillUnmount: function () {
+        this.subscription.stop();
     },
     getDomain: function () {
-        return url.parse(this.props.flame.get("url")).hostname;
+        return url.parse(this.props.spark.get("url")).hostname;
     },
     getAge: function () {
         return vagueTime.get({
-            to: this.props.flame.get("date")
+            to: this.props.spark.get("date")
         });
     },
-    vote: function (direction) {
-        console.log("%svoting", direction);
+    getUser: function () {
+        var userId = this.props.spark.get("userId");
+        var username = this.props.users.getIn([userId, "profile", "username"]);
+        return ("by " + username);
     },
     render: function () {
         return (
             <div style={styles.card}>
                 <div style={styles.position}>
-                    {this.props.flame.get("position") + "."}
+                    {this.props.position + "."}
                 </div>
-                <div style={styles.voteButtons}>
-                    <div style={styles.clickable} onClick={R.partial(this.vote, "up")}>
-                        {"+"}
-                    </div>
-                    <div style={styles.clickable} onClick={R.partial(this.vote, "down")}>
-                        {"-"}
-                    </div>
-                </div>
+                <components.Voter collection="sparks" _id={this.props.spark.get("_id")} />
                 <div style={styles.info}>
                     <div>
                         <span style={styles.title}>
-                            {this.props.flame.get("title")}
+                            {this.props.spark.get("title")}
                         </span>
                         <span style={styles.domain}>
                             {"(" + this.getDomain() + ")"}
@@ -92,10 +88,10 @@ var FlameCard = React.createClass({
                     </div>
                     <div>
                         <span style={styles.secondLineToken}>
-                            {this.props.flame.get("points") + " points"}
+                            {this.props.spark.get("points") + " points"}
                         </span>
                         <span style={styles.secondLineToken}>
-                            {"by " + this.props.flame.get("kindler")}
+                            {this.getUser()}
                         </span>
                         <span style={styles.secondLineToken}>
                             {this.getAge()}
@@ -104,7 +100,7 @@ var FlameCard = React.createClass({
                             {"|"}
                         </span>
                         <span style={styles.secondLineToken}>
-                            {this.props.flame.get("numberOfComments") + " comments"}
+                            {this.props.spark.get("flamesCount") + " flames"}
                         </span>
                     </div>
                 </div>
@@ -113,4 +109,4 @@ var FlameCard = React.createClass({
     }
 });
 
-module.exports = FlameCard;
+module.exports = SparkCard;

@@ -1,4 +1,5 @@
 var getCollectionStore = require("lib/get-collection-store");
 
-exports.users = getCollectionStore("users");
 exports.flames = getCollectionStore("flames");
+exports.sparks = getCollectionStore("sparks");
+exports.users = getCollectionStore("users");

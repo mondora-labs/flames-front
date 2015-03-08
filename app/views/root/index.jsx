@@ -14,11 +14,13 @@ var rootStyle = {
 var Root = React.createClass({
     mixins: [
         Reflux.connect(stores.flames, "flames"),
+        Reflux.connect(stores.sparks, "sparks"),
         Reflux.connect(stores.users, "users")
     ],
     getInitialState: function () {
         return {
             flames: stores.flames.flames,
+            sparks: stores.sparks.sparks,
             users: stores.users.users
         };
     },
@@ -29,18 +31,17 @@ var Root = React.createClass({
     },
     componentDidMount: function () {
         ceres.on("login", this.setUserId);
+        ceres.on("logout", this.setUserId);
     },
     componentWillUnmount: function () {
         ceres.off("login", this.setUserId);
+        ceres.off("logout", this.setUserId);
     },
     render: function () {
         return (
             <div style={rootStyle}>
-                <components.Header userId={this.state.userId} users={this.state.users} />
-                <Router.RouteHandler
-                    flames={this.state.flames}
-                    users={this.state.users}
-                />
+                <components.Header {...this.state} />
+                <Router.RouteHandler {...this.state} />
             </div>
         );
     }

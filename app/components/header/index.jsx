@@ -45,7 +45,7 @@ var Header = React.createClass({
         var user = this.props.users.get(this.props.userId);
         return (
             user ?
-            <span style={styles.username}>{user.getIn(["profile", "name"])}</span> :
+            <span style={styles.username}>{user.getIn(["profile", "username"])}</span> :
             <span style={styles.loginButton} onClick={this.login}>login</span>
         );
     },
@@ -55,7 +55,7 @@ var Header = React.createClass({
                 <span>
                     {":m"}
                     <span style={styles.spacer}></span>
-                    {"/" + this.getParams().name}
+                    {"/" + (this.getParams().name || "")}
                 </span>
                 {this.renderLogin()}
             </div>
