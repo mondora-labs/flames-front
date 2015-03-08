@@ -100,7 +100,9 @@ var SparkCard = React.createClass({
                             {"|"}
                         </span>
                         <span style={styles.secondLineToken}>
-                            {this.props.spark.get("flamesCount") + " flames"}
+                            <Router.Link to="s" params={{id: this.props.spark.get("_id")}}>
+                                {this.props.spark.get("flamesCount") + " flames"}
+                            </Router.Link>
                         </span>
                     </div>
                 </div>
