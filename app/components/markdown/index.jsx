@@ -19,10 +19,6 @@ var markdown = new Remarkable({
     }
 });
 
-var style = {
-    borderRadius: 2
-};
-
 var Markdown = React.createClass({
     propTypes: {
         string: React.PropTypes.string
@@ -36,7 +32,7 @@ var Markdown = React.createClass({
                 <style>
                     {".ac-markdown code {border-radius: 2px;}"}
                 </style>
-                <div style={style} dangerouslySetInnerHTML={innerHtml}></div>
+                <div dangerouslySetInnerHTML={innerHtml}></div>
             </div>
         );
     }
